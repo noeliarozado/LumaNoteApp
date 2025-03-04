@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #notesList {
+            list-style-type: none;
+            padding: 0;
+        }
+        #notesList li {
+            padding: 10px;
+            margin-bottom: 5px;
+            background-color: #f4f4f4;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Notes App</h1>
+
+    <!-- Note input -->
+    <textarea id="noteInput" placeholder="Write your note here..." rows="4" cols="50"></textarea><br>
+    <button onclick="addNote()">Save Note</button>
+
+    <h2>Saved Notes</h2>
+    <ul id="notesList"></ul>
+
+    <script>
+        // Function to load and display notes
+        function loadNotes() {
+            fetch("http://localhost:3000/notes")
+                .then(response => response.json()) // Parse the JSON response
+                .then(data => {
+                    if (Array.isArray(data)) { // Ensure data is an array
+                        const notesList = document.getElementById("notesList");
+                        notesList.innerHTML = ""; // Clear current notes
+
+                        // Iterate over the notes array and display each note
+                        data.map(note => {
+                            const listItem = document.createElement("li");
+                            listItem.textContent = note.content;
+                            notesList.appendChild(listItem);
+                        });
+                    } else {
+                        console.error('Error: Expected an array of notes');
+                    }
+                })
+                .catch(error => console.log('Error loading notes:', error));
+        }
+
+        // Function to add a new note
+        function addNote() {
+            const noteContent = document.getElementById("noteInput").value;
+
+            // Ensure there is content before sending a request
+            if (noteContent.trim() === "") {
+                alert("Please enter some text for the note!");
+                return;
+            }
+
+            fetch("http://localhost:3000/notes", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ content: noteContent }) // Send the note content as JSON
+            })
+            .then(response => response.json())
+            .then(() => {
+                loadNotes(); // Reload the list of notes after saving
+                document.getElementById("noteInput").value = ""; // Clear the input field
+            })
+            .catch(error => console.log('Error saving note:', error));
+        }
+
+        // Load notes when the page is loaded
+        window.onload = loadNotes;
+    </script>
+</body>
+</html>
