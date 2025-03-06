@@ -17,13 +17,20 @@
             margin-bottom: 5px;
             background-color: #f4f4f4;
             border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .date-header {
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 1.2em;
         }
     </style>
 </head>
 <body>
     <h1>Notes App</h1>
 
-    <!-- Note input -->
     <textarea id="noteInput" placeholder="Write your note here..." rows="4" cols="50"></textarea><br>
     <button onclick="addNote()">Save Note</button>
 
@@ -31,33 +38,41 @@
     <ul id="notesList"></ul>
 
     <script>
-        // Function to load and display notes
         function loadNotes() {
             fetch("http://localhost:3000/notes")
-                .then(response => response.json()) // Parse the JSON response
+                .then(response => response.json())
                 .then(data => {
-                    if (Array.isArray(data)) { // Ensure data is an array
-                        const notesList = document.getElementById("notesList");
-                        notesList.innerHTML = ""; // Clear current notes
+                    const notesList = document.getElementById("notesList");
+                    notesList.innerHTML = "";
 
-                        // Iterate over the notes array and display each note
-                        data.map(note => {
-                            const listItem = document.createElement("li");
-                            listItem.textContent = note.content;
-                            notesList.appendChild(listItem);
-                        });
-                    } else {
-                        console.error('Error: Expected an array of notes');
-                    }
+                    let lastDate = "";
+
+                    data.forEach(note => {
+                        const currentDate = new Date(note.date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+
+                        // Show date header if it's a new day
+                        if (currentDate !== lastDate) {
+                            const dateHeader = document.createElement("li");
+                            dateHeader.textContent = currentDate;
+                            dateHeader.classList.add("date-header");
+                            notesList.appendChild(dateHeader);
+                            lastDate = currentDate;
+                        }
+
+                        const listItem = document.createElement("li");
+                        listItem.innerHTML = `
+                            <span id="note-text-${note.id}">${note.content}</span>
+                            <button onclick="editNote(${note.id})">Edit</button>
+                            <button onclick="deleteNote(${note.id})">Delete</button>
+                        `;
+                        notesList.appendChild(listItem);
+                    });
                 })
                 .catch(error => console.log('Error loading notes:', error));
         }
 
-        // Function to add a new note
         function addNote() {
             const noteContent = document.getElementById("noteInput").value;
-
-            // Ensure there is content before sending a request
             if (noteContent.trim() === "") {
                 alert("Please enter some text for the note!");
                 return;
@@ -65,20 +80,41 @@
 
             fetch("http://localhost:3000/notes", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ content: noteContent }) // Send the note content as JSON
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: noteContent })
             })
             .then(response => response.json())
             .then(() => {
-                loadNotes(); // Reload the list of notes after saving
-                document.getElementById("noteInput").value = ""; // Clear the input field
+                loadNotes();
+                document.getElementById("noteInput").value = "";
             })
             .catch(error => console.log('Error saving note:', error));
         }
 
-        // Load notes when the page is loaded
+        function editNote(noteId) {
+            const noteText = document.getElementById(`note-text-${noteId}`);
+            const newText = prompt("Edit your note:", noteText.textContent);
+            if (newText !== null) {
+                fetch(`http://localhost:3000/notes/${noteId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ content: newText })
+                })
+                .then(() => loadNotes())
+                .catch(error => console.log("Error updating note:", error));
+            }
+        }
+
+        function deleteNote(noteId) {
+            if (confirm("Are you sure you want to delete this note?")) {
+                fetch(`http://localhost:3000/notes/${noteId}`, {
+                    method: "DELETE"
+                })
+                .then(() => loadNotes())
+                .catch(error => console.log("Error deleting note:", error));
+            }
+        }
+
         window.onload = loadNotes;
     </script>
 </body>
