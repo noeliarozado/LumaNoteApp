@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,38 +9,42 @@
         body {
             font-family: Arial, sans-serif;
         }
+
         #notesList {
             list-style-type: none;
             padding: 0;
         }
+
         #notesList li {
             padding: 10px;
             margin-bottom: 5px;
             background-color: #f4f4f4;
             border-radius: 5px;
         }
-        .date-header {
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-top: 15px;
+
+        img {
+            max-width: 100px;
+            display: block;
+            margin-top: 5px;
         }
-        button {
-            margin-left: 10px;
+
+        h3 {
+            margin-top: 20px;
         }
     </style>
 </head>
+
 <body>
     <h1>Notes App</h1>
 
-    <!-- Note input -->
     <textarea id="noteInput" placeholder="Write your note here..." rows="4" cols="50"></textarea><br>
+    <input type="file" id="imageInput"><br>
     <button onclick="addNote()">Save Note</button>
 
     <h2>Saved Notes</h2>
     <ul id="notesList"></ul>
 
     <script>
-        // Function to load and display notes
         function loadNotes() {
             fetch("http://localhost:3000/notes")
                 .then(response => response.json())
@@ -51,90 +56,97 @@
                         let lastDate = "";
 
                         data.forEach(note => {
-                            // Add a date header if it's a new day
                             if (note.date !== lastDate) {
-                                lastDate = note.date;
                                 const dateHeader = document.createElement("h3");
-                                dateHeader.textContent = new Date(note.date).toDateString();
-                                dateHeader.classList.add("date-header");
+                                dateHeader.textContent = note.date;
                                 notesList.appendChild(dateHeader);
+                                lastDate = note.date;
                             }
 
-                            // Create the note item
                             const listItem = document.createElement("li");
-                            listItem.textContent = note.content;
-
-                            // Edit Button
-                            const editButton = document.createElement("button");
-                            editButton.textContent = "Edit";
-                            editButton.onclick = () => editNote(note.id, note.content);
-
-                            // Delete Button
-                            const deleteButton = document.createElement("button");
-                            deleteButton.textContent = "Delete";
-                            deleteButton.onclick = () => deleteNote(note.id);
-
-                            listItem.appendChild(editButton);
-                            listItem.appendChild(deleteButton);
+                            listItem.innerHTML = `
+                                <span>${note.content}</span>
+                                ${note.image_url ? `<img src="http://localhost:3000${note.image_url}" alt="Note Image">` : ""}
+                                <button onclick="startEdit(${note.id}, this)">✏️ Edit</button>
+                                <button onclick="deleteNote(${note.id})">🗑️ Delete</button>
+                            `;
                             notesList.appendChild(listItem);
                         });
                     } else {
-                        console.error('Error: Expected an array of notes');
+                        console.error("Error: Expected an array of notes");
                     }
                 })
-                .catch(error => console.log('Error loading notes:', error));
+                .catch(error => console.log("Error loading notes:", error));
         }
 
-        // Function to add a new note
         function addNote() {
             const noteContent = document.getElementById("noteInput").value;
+            const imageInput = document.getElementById("imageInput").files[0];
 
-            if (noteContent.trim() === "") {
-                alert("Please enter some text for the note!");
+            if (noteContent.trim() === "" && !imageInput) {
+                alert("Please enter a note or select an image.");
                 return;
             }
 
+            const formData = new FormData();
+            formData.append("content", noteContent);
+            if (imageInput) formData.append("image", imageInput);
+
             fetch("http://localhost:3000/notes", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ content: noteContent })
+                body: formData
             })
-            .then(() => {
-                loadNotes();
-                document.getElementById("noteInput").value = "";
-            })
-            .catch(error => console.log('Error saving note:', error));
-        }
-
-        // Function to edit a note
-        function editNote(id, oldContent) {
-            const newContent = prompt("Edit your note:", oldContent);
-            if (newContent !== null) {
-                fetch(`http://localhost:3000/notes/${id}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ content: newContent })
+                .then(() => {
+                    loadNotes();
+                    document.getElementById("noteInput").value = "";
+                    document.getElementById("imageInput").value = "";
                 })
-                .then(() => loadNotes())
-                .catch(error => console.log('Error editing note:', error));
-            }
+                .catch(error => console.log("Error saving note:", error));
         }
 
-        // Function to delete a note
+        function startEdit(id, button) {
+            const listItem = button.parentElement;
+            const span = listItem.querySelector("span");
+
+            const input = document.createElement("input");
+            input.type = "text";
+            input.value = span.textContent;
+            listItem.replaceChild(input, span);
+
+            button.textContent = "💾 Save";
+            button.onclick = () => saveEdit(id, input, button);
+        }
+
+        function saveEdit(id, input, button) {
+            const newContent = input.value.trim();
+            if (newContent === "") return;
+
+            fetch(`http://localhost:3000/notes/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: newContent })
+            })
+                .then(() => {
+                    const span = document.createElement("span");
+                    span.textContent = newContent;
+
+                    const listItem = button.parentElement;
+                    listItem.replaceChild(span, input);
+
+                    button.textContent = "✏️ Edit";
+                    button.onclick = () => startEdit(id, button);
+                })
+                .catch(error => console.log("Error editing note:", error));
+        }
+
         function deleteNote(id) {
-            if (confirm("Are you sure you want to delete this note?")) {
-                fetch(`http://localhost:3000/notes/${id}`, {
-                    method: "DELETE"
-                })
+            fetch(`http://localhost:3000/notes/${id}`, { method: "DELETE" })
                 .then(() => loadNotes())
-                .catch(error => console.log('Error deleting note:', error));
-            }
+                .catch(error => console.log("Error deleting note:", error));
         }
 
-        // Load notes when the page is loaded
         window.onload = loadNotes;
     </script>
 </body>
+
 </html>
