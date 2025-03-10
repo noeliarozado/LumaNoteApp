@@ -64,13 +64,22 @@
                             }
 
                             const listItem = document.createElement("li");
+                            
+                            // Convert URLs into clickable links
+                            const formattedContent = note.content.replace(
+                                /(https?:\/\/[^\s]+)/g,
+                                '<a href="$1" target="_blank">$1</a>'
+                            );
+
                             listItem.innerHTML = `
-                                <span>${note.content}</span>
+                                <span>${formattedContent}</span>
                                 ${note.image_url ? `<img src="http://localhost:3000${note.image_url}" alt="Note Image">` : ""}
                                 <button onclick="startEdit(${note.id}, this)">✏️ Edit</button>
                                 <button onclick="deleteNote(${note.id})">🗑️ Delete</button>
                             `;
+
                             notesList.appendChild(listItem);
+
                         });
                     } else {
                         console.error("Error: Expected an array of notes");
