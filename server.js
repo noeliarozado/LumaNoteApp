@@ -46,7 +46,8 @@ db.run(`
 
 // Fetch all notes
 app.get("/notes", (req, res) => {
-    db.all("SELECT * FROM notes ORDER BY date DESC, id DESC", [], (err, rows) => {
+    db.all('SELECT * FROM notes ORDER BY date(date) DESC, id DESC', [], (err, rows) => {
+
         if (err) {
             res.status(500).json({ error: err.message });
         } else {
@@ -59,9 +60,7 @@ app.get("/notes", (req, res) => {
 app.post("/notes", upload.single("image"), (req, res) => {
     const { content } = req.body;
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
-    const date = new Date().toLocaleDateString("en-US", {
-        weekday: "long", month: "long", day: "numeric", year: "numeric"
-    });
+    const date = new Date().toISOString().split("T")[0];
 
     db.run("INSERT INTO notes (content, image_url, date) VALUES (?, ?, ?)",
         [content, imageUrl, date], function (err) {

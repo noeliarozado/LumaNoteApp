@@ -31,11 +31,37 @@
         h3 {
             margin-top: 20px;
         }
+
+        .dark-mode {
+            background-color: #121212;
+            color: white;
+        }
+
+        .dark-mode button {
+            background-color: #333;
+            color: white;
+            border: 1px solid white;
+        }
+
+        .dark-mode textarea,
+        .dark-mode input {
+            background-color: #333;
+            color: white;
+            border: 1px solid white;
+        }
+
+        .dark-mode li {
+            background-color: #333;
+            color: white;
+            border: 1px solid white;
+        }
     </style>
 </head>
 
 <body>
     <h1>Notes App</h1>
+
+    <button onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
 
     <textarea id="noteInput" placeholder="Write your note here..." rows="4" cols="50"></textarea><br>
     <input type="file" id="imageInput"><br>
@@ -56,15 +82,20 @@
                         let lastDate = "";
 
                         data.forEach(note => {
-                            if (note.date !== lastDate) {
+                            const dateObj = new Date(note.date);
+                            const formattedDate = dateObj.toLocaleDateString("en-US", {
+                                weekday: "long", month: "long", day: "numeric", year: "numeric"
+                            });
+
+                            if (formattedDate !== lastDate) {
                                 const dateHeader = document.createElement("h3");
-                                dateHeader.textContent = note.date;
+                                dateHeader.textContent = formattedDate;
                                 notesList.appendChild(dateHeader);
-                                lastDate = note.date;
+                                lastDate = formattedDate;
                             }
 
                             const listItem = document.createElement("li");
-                            
+
                             // Convert URLs into clickable links
                             const formattedContent = note.content.replace(
                                 /(https?:\/\/[^\s]+)/g,
@@ -152,6 +183,18 @@
             fetch(`http://localhost:3000/notes/${id}`, { method: "DELETE" })
                 .then(() => loadNotes())
                 .catch(error => console.log("Error deleting note:", error));
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+
+            // Save the user's preference
+            localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+        }
+
+        // Apply dark mode on page load if previously selected
+        if (localStorage.getItem("darkMode") === "true") {
+            document.body.classList.add("dark-mode");
         }
 
         window.onload = loadNotes;
