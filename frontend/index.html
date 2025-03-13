@@ -73,6 +73,9 @@
     <button onclick="addNote()">Save Note</button>
 
     <h2>Saved Notes</h2>
+
+    <input type="text" id="searchInput" placeholder="Search notes..." oninput="filterNotes()">
+
     <ul id="notesList"></ul>
 
     <script>
@@ -200,6 +203,20 @@
         // Apply dark mode on page load if previously selected
         if (localStorage.getItem("darkMode") === "true") {
             document.body.classList.add("dark-mode");
+        }
+
+        function filterNotes() {
+            const searchValue = document.getElementById("searchInput").value.toLowerCase();
+            const notes = document.querySelectorAll("#notesList li");
+
+            notes.forEach(note => {
+                const text = note.querySelector("span").textContent.toLowerCase();
+                if (text.includes(searchValue)) {
+                    note.style.display = "block"; // Show matching notes
+                } else {
+                    note.style.display = "none"; // Hide non-matching notes
+                }
+            });
         }
 
         window.onload = loadNotes;
