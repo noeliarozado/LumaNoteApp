@@ -32,13 +32,14 @@ const db = new sqlite3.Database("./notes.db", (err) => {
     }
 });
 
-// Create 'notes' table with image support and date
+// Create 'notes' table
 db.run(`
     CREATE TABLE IF NOT EXISTS notes (
         id INTEGER PRIMARY KEY, 
         content TEXT, 
         image_url TEXT, 
-        date TEXT
+        date TEXT,
+        favorite INTEGER DEFAULT 0
     )
 `, (err) => {
     if (err) console.log("Error creating table", err);
@@ -46,13 +47,23 @@ db.run(`
 
 // Fetch all notes
 app.get("/notes", (req, res) => {
-    db.all('SELECT * FROM notes ORDER BY date(date) DESC, id DESC', [], (err, rows) => {
-
+    db.all("SELECT * FROM notes ORDER BY favorite DESC, date DESC", [], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
-        } else {
-            res.json(rows);
+            return;
         }
+
+        // Format the date before sending it to the frontend
+        const formattedNotes = rows.map(note => ({
+            ...note,
+            date: new Date(note.date).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            })
+        }));
+
+        res.json(formattedNotes);
     });
 });
 
@@ -60,7 +71,9 @@ app.get("/notes", (req, res) => {
 app.post("/notes", upload.single("image"), (req, res) => {
     const { content } = req.body;
     const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
-    const date = new Date().toISOString().split("T")[0];
+    const options = { day: "numeric", month: "long", year: "numeric" };
+    const date = new Date().toLocaleDateString("en-GB", options);
+
 
     db.run("INSERT INTO notes (content, image_url, date) VALUES (?, ?, ?)",
         [content, imageUrl, date], function (err) {
@@ -95,6 +108,18 @@ app.delete("/notes/:id", (req, res) => {
             res.status(500).json({ error: err.message });
         } else {
             res.json({ message: "Note deleted successfully" });
+        }
+    });
+});
+
+// Toggle favorite status
+app.put("/notes/:id/favorite", (req, res) => {
+    const { id } = req.params;
+    db.run("UPDATE notes SET favorite = NOT favorite WHERE id = ?", [id], function (err) {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            res.json({ message: "Favorite status updated" });
         }
     });
 });

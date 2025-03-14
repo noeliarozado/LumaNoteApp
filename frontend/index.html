@@ -90,35 +90,24 @@
                         let lastDate = "";
 
                         data.forEach(note => {
-                            const dateObj = new Date(note.date);
-                            const formattedDate = dateObj.toLocaleDateString("en-US", {
-                                weekday: "long", month: "long", day: "numeric", year: "numeric"
-                            });
-
-                            if (formattedDate !== lastDate) {
+                            if (note.date !== lastDate) {
                                 const dateHeader = document.createElement("h3");
-                                dateHeader.textContent = formattedDate;
+                                dateHeader.textContent = note.date;
                                 notesList.appendChild(dateHeader);
-                                lastDate = formattedDate;
+                                lastDate = note.date;
                             }
 
                             const listItem = document.createElement("li");
-
-                            // Convert URLs into clickable links
-                            const formattedContent = note.content.replace(
-                                /(https?:\/\/[^\s]+)/g,
-                                '<a href="$1" target="_blank">$1</a>'
-                            );
-
                             listItem.innerHTML = `
-                                <span>${formattedContent}</span>
-                                ${note.image_url ? `<img src="http://localhost:3000${note.image_url}" alt="Note Image">` : ""}
-                                <button onclick="startEdit(${note.id}, this)">✏️ Edit</button>
-                                <button onclick="deleteNote(${note.id})">🗑️ Delete</button>
-                            `;
-
+                        <span>${note.content}</span>
+                        ${note.image_url ? `<img src="http://localhost:3000${note.image_url}" alt="Note Image">` : ""}
+                        <button onclick="toggleFavorite(${note.id}, this)">
+                            ${note.favorite ? "⭐ Unfavorite" : "☆ Favorite"}
+                        </button>
+                        <button onclick="startEdit(${note.id}, this)">✏️ Edit</button>
+                        <button onclick="deleteNote(${note.id})">🗑️ Delete</button>
+                    `;
                             notesList.appendChild(listItem);
-
                         });
                     } else {
                         console.error("Error: Expected an array of notes");
@@ -212,11 +201,17 @@
             notes.forEach(note => {
                 const text = note.querySelector("span").textContent.toLowerCase();
                 if (text.includes(searchValue)) {
-                    note.style.display = "block"; // Show matching notes
+                    note.style.display = "block";
                 } else {
-                    note.style.display = "none"; // Hide non-matching notes
+                    note.style.display = "none";
                 }
             });
+        }
+
+        function toggleFavorite(id, button) {
+            fetch(`http://localhost:3000/notes/${id}/favorite`, { method: "PUT" })
+                .then(() => loadNotes())
+                .catch(error => console.log("Error updating favorite status:", error));
         }
 
         window.onload = loadNotes;
