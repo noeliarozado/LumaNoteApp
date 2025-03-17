@@ -87,33 +87,54 @@
                         const notesList = document.getElementById("notesList");
                         notesList.innerHTML = "";
 
-                        let lastDate = "";
+                        const groupedNotes = {};
 
+                        // Group notes by date
                         data.forEach(note => {
-                            if (note.date !== lastDate) {
-                                const dateHeader = document.createElement("h3");
-                                dateHeader.textContent = note.date;
-                                notesList.appendChild(dateHeader);
-                                lastDate = note.date;
+                            if (!groupedNotes[note.date]) {
+                                groupedNotes[note.date] = { favorites: [], regular: [] };
                             }
-
-                            const listItem = document.createElement("li");
-                            listItem.innerHTML = `
-                        <span>${note.content}</span>
-                        ${note.image_url ? `<img src="http://localhost:3000${note.image_url}" alt="Note Image">` : ""}
-                        <button onclick="toggleFavorite(${note.id}, this)">
-                            ${note.favorite ? "⭐ Unfavorite" : "☆ Favorite"}
-                        </button>
-                        <button onclick="startEdit(${note.id}, this)">✏️ Edit</button>
-                        <button onclick="deleteNote(${note.id})">🗑️ Delete</button>
-                    `;
-                            notesList.appendChild(listItem);
+                            if (note.favorite) {
+                                groupedNotes[note.date].favorites.push(note);
+                            } else {
+                                groupedNotes[note.date].regular.push(note);
+                            }
                         });
+
+                        // Render notes from newest to oldest
+                        Object.keys(groupedNotes)
+                            .sort((a, b) => new Date(b) - new Date(a))
+                            .forEach(date => {
+                                const dateHeader = document.createElement("h3");
+                                dateHeader.textContent = date;
+                                notesList.appendChild(dateHeader);
+
+                                // Add favorite notes first
+                                groupedNotes[date].favorites.forEach(note => appendNoteToList(note, notesList));
+
+                                // Then add regular notes
+                                groupedNotes[date].regular.forEach(note => appendNoteToList(note, notesList));
+                            });
                     } else {
                         console.error("Error: Expected an array of notes");
                     }
                 })
                 .catch(error => console.log("Error loading notes:", error));
+        }
+
+        // Function to create and append a note item to the list
+        function appendNoteToList(note, notesList) {
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `
+        <span>${note.content}</span>
+        ${note.image_url ? `<img src="http://localhost:3000${note.image_url}" alt="Note Image">` : ""}
+        <button onclick="toggleFavorite(${note.id}, this)">
+            ${note.favorite ? "⭐ Unfavorite" : "☆ Favorite"}
+        </button>
+        <button onclick="startEdit(${note.id}, this)">✏️ Edit</button>
+        <button onclick="deleteNote(${note.id})">🗑️ Delete</button>
+    `;
+            notesList.appendChild(listItem);
         }
 
         function addNote() {
