@@ -87,21 +87,32 @@
                         const notesList = document.getElementById("notesList");
                         notesList.innerHTML = "";
 
+                        const favoriteNotes = [];
                         const groupedNotes = {};
 
-                        // Group notes by date
+                        // Separate favorite notes and group all notes by date
                         data.forEach(note => {
-                            if (!groupedNotes[note.date]) {
-                                groupedNotes[note.date] = { favorites: [], regular: [] };
-                            }
                             if (note.favorite) {
-                                groupedNotes[note.date].favorites.push(note);
-                            } else {
-                                groupedNotes[note.date].regular.push(note);
+                                favoriteNotes.push(note);
                             }
+
+                            if (!groupedNotes[note.date]) {
+                                groupedNotes[note.date] = [];
+                            }
+                            groupedNotes[note.date].push(note);
                         });
 
-                        // Render notes from newest to oldest
+                        // Add "Favorite Notes" Section
+                        if (favoriteNotes.length > 0) {
+                            const favHeader = document.createElement("h2");
+                            favHeader.textContent = "⭐ Favorite Notes";
+                            notesList.appendChild(favHeader);
+
+                            favoriteNotes
+                                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                .forEach(note => appendNoteToList(note, notesList));
+                        }
+
                         Object.keys(groupedNotes)
                             .sort((a, b) => new Date(b) - new Date(a))
                             .forEach(date => {
@@ -109,11 +120,7 @@
                                 dateHeader.textContent = date;
                                 notesList.appendChild(dateHeader);
 
-                                // Add favorite notes first
-                                groupedNotes[date].favorites.forEach(note => appendNoteToList(note, notesList));
-
-                                // Then add regular notes
-                                groupedNotes[date].regular.forEach(note => appendNoteToList(note, notesList));
+                                groupedNotes[date].forEach(note => appendNoteToList(note, notesList));
                             });
                     } else {
                         console.error("Error: Expected an array of notes");
@@ -121,7 +128,7 @@
                 })
                 .catch(error => console.log("Error loading notes:", error));
         }
-
+        
         // Function to create and append a note item to the list
         function appendNoteToList(note, notesList) {
             const listItem = document.createElement("li");
