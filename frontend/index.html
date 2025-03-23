@@ -5,78 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        #notesList {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        #notesList li {
-            padding: 10px;
-            margin-bottom: 5px;
-            background-color: #f4f4f4;
-            border-radius: 5px;
-        }
-
-        img {
-            max-width: 100px;
-            display: block;
-            margin-top: 5px;
-        }
-
-        h3 {
-            margin-top: 20px;
-        }
-
-        .dark-mode {
-            background-color: #121212;
-            color: white;
-        }
-
-        .dark-mode button {
-            background-color: #333;
-            color: white;
-            border: 1px solid white;
-        }
-
-        .dark-mode textarea,
-        .dark-mode input {
-            background-color: #333;
-            color: white;
-            border: 1px solid white;
-        }
-
-        .dark-mode li {
-            background-color: #333;
-            color: white;
-            border: 1px solid white;
-        }
-
-        body.dark-mode #notesList li {
-            color: black;
-            background-color: white;
-        }
-    </style>
+    <link rel="stylesheet" href="/frontend/styles.css">
 </head>
 
 <body>
-    <h1>Notes App</h1>
+    <div class="container">
+        <h1>Notes App</h1>
 
-    <button onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
+        <button onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
 
-    <textarea id="noteInput" placeholder="Write your note here..." rows="4" cols="50"></textarea><br>
-    <input type="file" id="imageInput"><br>
-    <button onclick="addNote()">Save Note</button>
+        <textarea id="noteInput" placeholder="Write your note here..." rows="4" cols="50"></textarea><br>
+        <input type="file" id="imageInput"><br>
+        <button onclick="addNote()">Save Note</button>
 
-    <h2>Saved Notes</h2>
+        <h2>Saved Notes</h2>
 
-    <input type="text" id="searchInput" placeholder="Search notes..." oninput="filterNotes()">
+        <input type="text" id="searchInput" placeholder="Search notes..." oninput="filterNotes()">
 
-    <ul id="notesList"></ul>
+        <ul id="notesList"></ul>
+    </div>
 
     <script>
         function loadNotes() {
@@ -128,7 +75,7 @@
                 })
                 .catch(error => console.log("Error loading notes:", error));
         }
-        
+
         // Function to create and append a note item to the list
         function appendNoteToList(note, notesList) {
             const listItem = document.createElement("li");

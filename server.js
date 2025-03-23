@@ -7,6 +7,9 @@ const path = require("path");
 const app = express();
 const port = 3000;
 
+// Serve static files from the frontend folder
+app.use(express.static(path.join(__dirname, 'frontend')));
+
 // Enable CORS and JSON parsing
 app.use(cors());
 app.use(express.json());
