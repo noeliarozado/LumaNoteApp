@@ -1,6 +1,6 @@
 /* Body styles */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Quicksand', sans-serif;
     background-color: #f0f4f8;
     margin: 0;
     padding: 0;
@@ -53,6 +53,23 @@ h2 {
     text-align: center;
     color: #6c63ff;
     margin-bottom: 20px;
+}
+
+/* Font Weights for specific elements */
+h1, h2 {
+    font-weight: 700;
+}
+
+button {
+    font-weight: 600;
+}
+
+p, textarea, input {
+    font-weight: 400;
+}
+
+input, textarea {
+    font-family: 'Quicksand', sans-serif;
 }
 
 /* Note input area */
