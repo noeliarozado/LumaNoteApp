@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes App</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/frontend/styles.css">
 </head>
 
@@ -80,15 +81,19 @@
         // Function to create and append a note item to the list
         function appendNoteToList(note, notesList) {
             const listItem = document.createElement("li");
+
             listItem.innerHTML = `
         <span>${note.content}</span>
         ${note.image_url ? `<img src="http://localhost:3000${note.image_url}" alt="Note Image">` : ""}
-        <button onclick="toggleFavorite(${note.id}, this)">
-            ${note.favorite ? "⭐ Unfavorite" : "☆ Favorite"}
-        </button>
-        <button onclick="startEdit(${note.id}, this)">✏️ Edit</button>
-        <button onclick="deleteNote(${note.id})">🗑️ Delete</button>
+        <div class="note-buttons">
+            <button onclick="toggleFavorite(${note.id}, this)">
+                ${note.favorite ? "⭐ Unfavorite" : "☆ Favorite"}
+            </button>
+            <button onclick="startEdit(${note.id}, this)">✏️ Edit</button>
+            <button onclick="deleteNote(${note.id})">🗑️ Delete</button>
+        </div>
     `;
+
             notesList.appendChild(listItem);
         }
 

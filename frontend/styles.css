@@ -56,7 +56,8 @@ h2 {
 }
 
 /* Font Weights for specific elements */
-h1, h2 {
+h1,
+h2 {
     font-weight: 700;
 }
 
@@ -64,24 +65,27 @@ button {
     font-weight: 600;
 }
 
-p, textarea, input {
+p,
+textarea,
+input {
     font-weight: 400;
 }
 
-input, textarea {
+input,
+textarea {
     font-family: 'Quicksand', sans-serif;
 }
 
 /* Note input area */
 textarea {
-    width: 100%; 
+    width: 100%;
     padding: 15px;
     margin-bottom: 15px;
     border-radius: 8px;
     border: 1px solid #ddd;
     resize: none;
     font-size: 1rem;
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 textarea:focus {
@@ -134,6 +138,17 @@ button:hover {
 #notesList li button {
     margin-top: 10px;
     align-self: flex-start;
+}
+
+.note-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.note-buttons button {
+    flex-shrink: 0;
 }
 
 /* Search box */
