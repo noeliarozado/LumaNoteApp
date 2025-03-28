@@ -123,7 +123,7 @@
         }
 
         function startEdit(id, button) {
-            const listItem = button.parentElement;
+            const listItem = button.closest("li"); // Find the parent <li>
             const span = listItem.querySelector("span");
 
             const input = document.createElement("input");
