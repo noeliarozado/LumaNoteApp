@@ -120,7 +120,7 @@ button:hover {
 }
 
 #notesList li {
-    background-color: #e7e7e7;
+    background-color: #cce4f7;
     margin-bottom: 15px;
     padding: 15px;
     border-radius: 8px;
@@ -130,9 +130,10 @@ button:hover {
 }
 
 #notesList li img {
-    max-width: 100px;
+    max-width: 250px; 
     border-radius: 5px;
     margin-top: 10px;
+    object-fit: cover;
 }
 
 #notesList li button {
@@ -184,4 +185,19 @@ h3 {
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    textarea {
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+    button {
+        padding: 8px 15px;
+    }
 }
