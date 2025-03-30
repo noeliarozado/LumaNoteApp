@@ -17,12 +17,19 @@
         <button onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
 
         <textarea id="noteInput" placeholder="Write your note here..." rows="4" cols="50"></textarea><br>
-        <input type="file" id="imageInput"><br>
-        <button onclick="addNote()">Save Note</button>
+        <div class="custom-file-upload">
+            <label for="imageInput">📁 Upload File</label>
+            <input type="file" id="imageInput">
+            <span id="fileName">No file selected</span>
+        </div>
 
+        <br>
+        <button onclick="addNote()">Save note</button>
+
+        <!--
         <h2>Saved Notes</h2>
-
         <input type="text" id="searchInput" placeholder="Search notes..." oninput="filterNotes()">
+        -->
 
         <ul id="notesList"></ul>
     </div>
@@ -54,7 +61,7 @@
                         // Add "Favorite Notes" Section
                         if (favoriteNotes.length > 0) {
                             const favHeader = document.createElement("h2");
-                            favHeader.textContent = "⭐ Favorite Notes";
+                            favHeader.textContent = "⭐ My favourite notes";
                             notesList.appendChild(favHeader);
 
                             favoriteNotes
@@ -76,6 +83,24 @@
                     }
                 })
                 .catch(error => console.log("Error loading notes:", error));
+        }
+
+        // Show the selected file nam
+        document.getElementById("imageInput").addEventListener("change", function () {
+            const fileName = this.files.length > 0 ? this.files[0].name : "No file selected";
+            document.getElementById("fileName").textContent = fileName;
+        });
+
+        // Function that updates the text next to the button when a file is selected
+        function updateFileName() {
+            const fileInput = document.getElementById("imageInput");
+            const fileNameDisplay = document.getElementById("fileName");
+
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.textContent = fileInput.files[0].name;
+            } else {
+                fileNameDisplay.textContent = "No file selected";
+            }
         }
 
         // Function to create and append a note item to the list
@@ -166,14 +191,22 @@
         function toggleDarkMode() {
             document.body.classList.toggle("dark-mode");
 
-            // Save the user's preference
-            localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+            const darkModeEnabled = document.body.classList.contains("dark-mode");
+            localStorage.setItem("darkMode", darkModeEnabled);
+
+            const button = document.querySelector("button[onclick='toggleDarkMode()']");
+            button.textContent = darkModeEnabled ? "☀️ Toggle Light Mode" : "🌙 Toggle Dark Mode";
         }
 
-        // Apply dark mode on page load if previously selected
-        if (localStorage.getItem("darkMode") === "true") {
-            document.body.classList.add("dark-mode");
-        }
+        // Set the correct button text on page load
+        window.onload = function () {
+            loadNotes();
+
+            if (localStorage.getItem("darkMode") === "true") {
+                document.body.classList.add("dark-mode");
+                document.querySelector("button[onclick='toggleDarkMode()']").textContent = "☀️ Toggle Light Mode";
+            }
+        };
 
         function filterNotes() {
             const searchValue = document.getElementById("searchInput").value.toLowerCase();
