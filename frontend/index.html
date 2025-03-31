@@ -19,12 +19,12 @@
         <textarea id="noteInput" placeholder="Write your note here..." rows="4" cols="50"></textarea><br>
         <div class="custom-file-upload">
             <label for="imageInput">📁 Upload File</label>
-            <input type="file" id="imageInput">
+            <input type="file" id="imageInput" accept="image/*,application/pdf">
             <span id="fileName">No file selected</span>
         </div>
 
         <br>
-        <button onclick="addNote()">Save note</button>
+        <button class="small-btn" onclick="addNote()">Save note</button>
 
         <!--
         <h2>Saved Notes</h2>
@@ -109,7 +109,14 @@
 
             listItem.innerHTML = `
         <span>${note.content}</span>
-        ${note.image_url ? `<img src="http://localhost:3000${note.image_url}" alt="Note Image">` : ""}
+        ${note.image_url ? (note.image_url.endsWith(".pdf")
+                    ? `<a href="http://localhost:3000${note.image_url}" target="_blank" 
+          style="text-decoration: none; color: #6c63ff; font-weight: 600;">
+          📄 ${note.image_url.split('/').pop()}
+       </a>`
+                    : `<img src="http://localhost:3000${note.image_url}" alt="Note Image">`)
+                    : ""}
+
         <div class="note-buttons">
             <button onclick="toggleFavorite(${note.id}, this)">
                 ${note.favorite ? "⭐ Unfavorite" : "☆ Favorite"}
