@@ -52,6 +52,19 @@ body.dark-mode button:hover {
     border-color: #aaa; 
 }
 
+body.dark-mode .custom-file-upload label {
+    background-color: #444;
+    color: #f0f0f0;
+    border: 1px solid #888;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .custom-file-upload label:hover {
+    background-color: #333;
+    border: 1px solid #aaa; 
+    box-shadow: 0 6px 12px rgba(255, 255, 255, 0.2);
+}
+
 /* Header styling */
 h1,
 h2 {
@@ -126,10 +139,14 @@ button:hover {
 }
 
 .custom-file-upload label {
-    padding: 10px 20px; 
+    padding: 4px 8px;
+    font-size: 0.8rem; 
+    height: 25px;
+    min-width: 60px;
+    display: inline-block;
+    text-align: center;
     background-color: #6c63ff;
     color: white;
-    font-size: 1rem; 
     font-weight: 600;
     border: none;
     border-radius: 5px;
@@ -151,10 +168,19 @@ button:hover {
 }
 
 .small-btn {
-    padding: 4px 10px;
-    font-size: 0.8rem;
-    height: 30px;
-    min-width: 90px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    background: linear-gradient(135deg, #ff9a8b, #ff6a88);
+    font-weight: 700;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(255, 106, 136, 0.3);
+    transition: all 0.3s ease;
+}
+
+.small-btn:hover {
+    background: linear-gradient(135deg, #ff6a88, #ff3e55);
+    box-shadow: 0 6px 12px rgba(255, 62, 85, 0.4);
+    transform: translateY(-2px);
 }
 
 /* Notes list styling */
