@@ -1,6 +1,6 @@
 # LUMANOTE APP
 
-A cozy note-taking app that lets you **write notes**, **upload images or PDFs**, and **mark favourites**.
+A cozy note-taking app built with **JavaScript** that lets you **write notes**, **upload images or PDFs**, and **mark favourites**.
 
 ## FEATURES
 - Create and instantly save notes.
