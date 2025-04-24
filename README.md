@@ -61,3 +61,11 @@ Make sure the Live Server extension is installed in your editor.
 - To stop the server, press Ctrl + C in the terminal.
 
 ## APP SCREENSHOTS
+
+## Dark mode
+
+![Dark mode](/Images/DarkMode.png)
+
+## Light mode
+
+![Light mode](/Images/LightMode.png)
